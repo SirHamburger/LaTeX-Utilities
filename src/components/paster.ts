@@ -536,7 +536,7 @@ export class Paster {
                         result += imgExtension
                     }
 
-                    result = makeImagePath(result)
+                    result = makeImagePath(result, this.disableGraphicsPath)
 
                     callback(null, result)
                 }
@@ -544,10 +544,15 @@ export class Paster {
                 return
             })
 
-        function makeImagePath(fileName: string) {
+        function makeImagePath(fileName: string, disableGraphicsPath: boolean ) {
             // image output path
             const folderPath = path.dirname(filePath)
             let imagePath = ''
+            if(!disableGraphicsPath)
+            {
+                if(vscode.window.activeTextEditor!=null)
+                return path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath) + "/" + fileName
+            }
 
             // generate image path
             if (path.isAbsolute(folderPathFromConfig)) {
@@ -784,16 +789,10 @@ export class Paster {
     ): string {
         const currentFileDir = path.dirname(curFilePath)
         let graphicsPath: string | string[] 
-        if(!this.disableGraphicsPath)
-        {
+
             graphicsPath = this.extension.workshop.getGraphicsPath()
             graphicsPath = graphicsPath.length !== 0 ? graphicsPath[0] : this.graphicsPathFallback
             graphicsPath = path.resolve(currentFileDir, graphicsPath)
-        }
-        else
-        {
-            return currentFileDir + "/"
-        }
 
 
         pathStr = pathStr.replace(this.PATH_VARIABLE_GRAPHICS_PATH, postFunction(graphicsPath))

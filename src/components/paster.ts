@@ -14,8 +14,9 @@ const readFile = promisify(fs.readFile)
 
 export class Paster {
     extension: Extension
-
+    private disableGraphicsPath: boolean
     constructor(extension: Extension) {
+        this.disableGraphicsPath = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.ignoreGraphicsPath') as boolean
         this.extension = extension
     }
 
@@ -417,7 +418,8 @@ export class Paster {
 
     public pasteImage(editor: vscode.TextEditor, baseFile: string, imgFile?: string) {
         this.extension.logger.addLogMessage('Pasting: Image')
-
+        if(this.disableGraphicsPath)
+            this.graphicsPathFallback = '${currentFileDir}'
         const folderPath = path.dirname(baseFile)
         const projectPath = vscode.workspace.workspaceFolders
             ? vscode.workspace.workspaceFolders[0].uri.fsPath
@@ -775,9 +777,18 @@ export class Paster {
         postFunction: (str: string) => string = x => x
     ): string {
         const currentFileDir = path.dirname(curFilePath)
-        let graphicsPath: string | string[] = this.extension.workshop.getGraphicsPath()
-        graphicsPath = graphicsPath.length !== 0 ? graphicsPath[0] : this.graphicsPathFallback
-        graphicsPath = path.resolve(currentFileDir, graphicsPath)
+        let graphicsPath: string | string[] 
+        if(!this.disableGraphicsPath)
+        {
+            graphicsPath = this.extension.workshop.getGraphicsPath()
+            graphicsPath = graphicsPath.length !== 0 ? graphicsPath[0] : this.graphicsPathFallback
+            graphicsPath = path.resolve(currentFileDir, graphicsPath)
+        }
+        else
+        {
+            return currentFileDir + "/"
+        }
+
 
         pathStr = pathStr.replace(this.PATH_VARIABLE_GRAPHICS_PATH, postFunction(graphicsPath))
         pathStr = pathStr.replace(this.PATH_VARIABLE_CURRNET_FILE_DIR, postFunction(currentFileDir))

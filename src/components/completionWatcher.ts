@@ -267,7 +267,7 @@ export class CompletionWatcher {
                     })
                 }
             } else {
-                resolve(undefined)
+                resolve("break")
             }
         })
     }

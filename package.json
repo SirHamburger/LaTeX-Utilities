@@ -139,6 +139,11 @@
                     "default": "\\includegraphics{${imageFilePath}}",
                     "markdownDescription": "The template to use for pasting the image (use an array for multiline strings), use `${imageFilePath}` to represent the image file. Can also use `${imageFileNameWithoutExt}`"
                 },
+                "latex-utilities.formattedPaste.image.ignoreGraphicsPath": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Ignore the graphics path and just use the current folder"
+                },
                 "latex-utilities.formattedPaste.useAsDefault": {
                     "type": "boolean",
                     "default": false,

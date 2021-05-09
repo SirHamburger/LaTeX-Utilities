@@ -155,6 +155,11 @@
                     "default": "\\includegraphics{${imageFilePath}}",
                     "markdownDescription": "The template to use for pasting the image (use an array for multiline strings), use `${imageFilePath}` to represent the image file. Can also use `${imageFileNameWithoutExt}`"
                 },
+                "latex-utilities.formattedPaste.image.useCaptionAsName": {
+                    "type": "boolean",
+                    "default": false,
+                    "markdownDescription": "Write the Caption on inserting the Image and the image name is set automaticly"
+                },
                 "latex-utilities.formattedPaste.image.ignoreGraphicsPath": {
                     "type": "boolean",
                     "default": false,

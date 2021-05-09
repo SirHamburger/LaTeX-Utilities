@@ -17,11 +17,15 @@ export class Paster {
     private disableGraphicsPath: boolean
     private prefixTableTemplate: string[]
     private suffixTableTemplate: string[]
+    private useCaptionAsName: boolean
+    private captionName: string
 
     constructor(extension: Extension) {
         this.disableGraphicsPath = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.ignoreGraphicsPath') as boolean
         this.prefixTableTemplate = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.PrefixTableTemplate') as string[]
         this.suffixTableTemplate = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.SuffixTableTemplate') as string[]
+        this.useCaptionAsName = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsName') as boolean
+        this.captionName=""
 
         this.extension = extension
     }
@@ -417,6 +421,8 @@ export class Paster {
     PATH_VARIABLE_IMAGE_FILE_PATH_WITHOUT_EXT = /\$\{imageFilePathWithoutExt\}/g
     PATH_VARIABLE_IMAGE_FILE_NAME = /\$\{imageFileName\}/g
     PATH_VARIABLE_IMAGE_FILE_NAME_WITHOUT_EXT = /\$\{imageFileNameWithoutExt\}/g
+    PATH_VARIABLE_IMAGE_Caption = /\$\{imageCaption\}/g
+    PATH_VARIABLE_IMAGE_Lable = /\$\{imageLable\}/g
 
     pasteTemplate: string = ''
     basePathConfig = '${graphicsPath}'
@@ -524,14 +530,35 @@ export class Paster {
         const imgExtension = path.extname(imagePathCurrent) ? path.extname(imagePathCurrent) : '.png'
         const imageFileName = selectText ? selectText + imgExtension : `image${imgPostfixNumber}` + imgExtension
 
+        let inputText = "";
+        let inputValue = ""
+        if(this.useCaptionAsName)
+        {
+            inputText = 'Please specify the caption of the image.'
+            inputValue = ""
+        }
+        else
+        {
+            inputText = 'Please specify the filename of the image.'
+            inputValue = imageFileName
+        }
         vscode.window
             .showInputBox({
-                prompt: 'Please specify the filename of the image.',
-                value: imageFileName,
+                prompt:inputText, //'Please specify the filename of the image.',
+                value: inputValue,
                 valueSelection: [imageFileName.length - imageFileName.length, imageFileName.length - 4]
             })
             .then(result => {
                 if (result) {
+                    if(this.useCaptionAsName)
+                    {
+                        let imageCaptionName=""
+                        result.split(" ").forEach(function (value){
+                            imageCaptionName+=value.charAt(0).toLocaleUpperCase() + value.substr(1,value.length)
+                        })
+                        this.captionName = imageCaptionName
+                        result = imageCaptionName
+                    }
                     if (!result.endsWith(imgExtension)) {
                         result += imgExtension
                     }
@@ -777,6 +804,16 @@ export class Paster {
         result = result.replace(this.PATH_VARIABLE_IMAGE_FILE_PATH_WITHOUT_EXT, imageFilePathWithoutExt)
         result = result.replace(this.PATH_VARIABLE_IMAGE_FILE_NAME, fileName)
         result = result.replace(this.PATH_VARIABLE_IMAGE_FILE_NAME_WITHOUT_EXT, fileNameWithoutExt)
+        
+        result = result.replace(this.PATH_VARIABLE_IMAGE_Caption, this.captionName)
+        let imageLableName=""
+        this.captionName.split(" ").forEach(function (value){
+            imageLableName+=value.charAt(0).toLocaleUpperCase() + value.substr(1,value.length)
+        })
+
+        result = result.replace(this.PATH_VARIABLE_IMAGE_Lable, "fig:" + imageLableName)
+         
+         
 
         return result
     }

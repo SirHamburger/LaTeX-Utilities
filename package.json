@@ -110,6 +110,22 @@
                     "default": true,
                     "markdownDescription": "Use the booktabs commands `\\toprule`, `\\midrule`, and `\\bottomrule`"
                 },
+                "latex-utilities.formattedPaste.PrefixTableTemplate": {
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "default": "\\begin{tabular}{",
+                    "markdownDescription": "The Prefix of a Table"
+                },
+                "latex-utilities.formattedPaste.SuffixTableTemplate": {
+                    "type": [
+                        "string",
+                        "array"
+                    ],
+                    "default": "\\end{tabular}",
+                    "markdownDescription": "The Suffix of a Table"
+                },
                 "latex-utilities.formattedPaste.tableHeaderRows": {
                     "type": "integer",
                     "default": 1,

@@ -15,8 +15,14 @@ const readFile = promisify(fs.readFile)
 export class Paster {
     extension: Extension
     private disableGraphicsPath: boolean
+    private prefixTableTemplate: string[]
+    private suffixTableTemplate: string[]
+
     constructor(extension: Extension) {
         this.disableGraphicsPath = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.ignoreGraphicsPath') as boolean
+        this.prefixTableTemplate = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.PrefixTableTemplate') as string[]
+        this.suffixTableTemplate = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.SuffixTableTemplate') as string[]
+
         this.extension = extension
     }
 
@@ -177,7 +183,7 @@ export class Paster {
         if (booktabs) {
             tabularContents = '\t\\toprule\n' + tabularContents + ' \\\\\n\t\\bottomrule'
         }
-        const tabular = `\\begin{tabular}{${columnType.repeat(table[0].length)}}\n${tabularContents}\n\\end{tabular}`
+        const tabular = `${this.prefixTableTemplate}${columnType.repeat(table[0].length)}}\n${tabularContents}\n${this.suffixTableTemplate}`
 
         editor.edit(edit => {
             const current = editor.selection

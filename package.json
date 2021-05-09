@@ -158,7 +158,12 @@
                 "latex-utilities.formattedPaste.image.useCaptionAsName": {
                     "type": "boolean",
                     "default": false,
-                    "markdownDescription": "Write the Caption on inserting the Image and the image name is set automaticly"
+                    "markdownDescription": "Write the Caption on inserting the Image and the image name is set automaticly with ${imageCaption} and ${imageLabel}. The schema for that is camel-case letters of the caption and a prefix for the label"
+                },
+                "latex-utilities.formattedPaste.image.useCaptionAsNameLabelPrefix": {
+                    "type": "string",
+                    "default": "fig:",
+                    "markdownDescription": "Add an prefix to the Label"
                 },
                 "latex-utilities.formattedPaste.image.ignoreGraphicsPath": {
                     "type": "boolean",

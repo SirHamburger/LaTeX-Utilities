@@ -19,13 +19,15 @@ export class Paster {
     private suffixTableTemplate: string[]
     private useCaptionAsName: boolean
     private captionName: string
+    private labelPrefix: string
 
     constructor(extension: Extension) {
         this.disableGraphicsPath = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.ignoreGraphicsPath') as boolean
         this.prefixTableTemplate = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.PrefixTableTemplate') as string[]
         this.suffixTableTemplate = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.SuffixTableTemplate') as string[]
         this.useCaptionAsName = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsName') as boolean
-        this.captionName=""
+        this.labelPrefix = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsNameLabelPrefix') as string
+        this.captionName = ""
 
         this.extension = extension
     }
@@ -141,7 +143,7 @@ export class Paster {
                 const table = await this.processTable(content, testDelimiter)
                 tables.push(table)
                 this.extension.logger.addLogMessage(`Successfully found ${testDelimiter} delimited table`)
-            } catch (e) {}
+            } catch (e) { }
         }
 
         if (tables.length === 0) {
@@ -293,10 +295,10 @@ export class Paster {
                 if (str[i] === '\n') {
                     lines.push(
                         (lines.length > 0 ? indent : '') +
-                            str
-                                .slice(Math.max(0, lastNewlinePosition), i)
-                                .replace(/^[^\S\t]+/, '')
-                                .replace(/\s+$/, '')
+                        str
+                            .slice(Math.max(0, lastNewlinePosition), i)
+                            .replace(/^[^\S\t]+/, '')
+                            .replace(/\s+$/, '')
                     )
                     lastNewlinePosition = i
                 }
@@ -306,10 +308,10 @@ export class Paster {
                 if (i - lastNewlinePosition >= lineLength - indent.length) {
                     lines.push(
                         (lines.length > 0 ? indent : '') +
-                            str
-                                .slice(Math.max(0, lastNewlinePosition), lastSplitCharPosition)
-                                .replace(/^[^\S\t]+/, '')
-                                .replace(/\s+$/, '')
+                        str
+                            .slice(Math.max(0, lastNewlinePosition), lastSplitCharPosition)
+                            .replace(/^[^\S\t]+/, '')
+                            .replace(/\s+$/, '')
                     )
                     lastNewlinePosition = lastSplitCharPosition
                     i = lastSplitCharPosition
@@ -318,10 +320,10 @@ export class Paster {
             if (lastNewlinePosition < i) {
                 lines.push(
                     (lines.length > 0 ? indent : '') +
-                        str
-                            .slice(Math.max(0, lastNewlinePosition), i)
-                            .replace(/^\s+/, '')
-                            .replace(/\s+$/, '')
+                    str
+                        .slice(Math.max(0, lastNewlinePosition), i)
+                        .replace(/^\s+/, '')
+                        .replace(/\s+$/, '')
                 )
             }
             console.log(lines.map(l => lineLength - l.length))
@@ -422,7 +424,7 @@ export class Paster {
     PATH_VARIABLE_IMAGE_FILE_NAME = /\$\{imageFileName\}/g
     PATH_VARIABLE_IMAGE_FILE_NAME_WITHOUT_EXT = /\$\{imageFileNameWithoutExt\}/g
     PATH_VARIABLE_IMAGE_Caption = /\$\{imageCaption\}/g
-    PATH_VARIABLE_IMAGE_Lable = /\$\{imageLable\}/g
+    PATH_VARIABLE_IMAGE_Lable = /\$\{imageLabel\}/g
 
     pasteTemplate: string = ''
     basePathConfig = '${graphicsPath}'
@@ -430,7 +432,7 @@ export class Paster {
 
     public pasteImage(editor: vscode.TextEditor, baseFile: string, imgFile?: string) {
         this.extension.logger.addLogMessage('Pasting: Image')
-        if(this.disableGraphicsPath)
+        if (this.disableGraphicsPath)
             this.graphicsPathFallback = '${currentFileDir}'
         const folderPath = path.dirname(baseFile)
         const projectPath = vscode.workspace.workspaceFolders
@@ -532,29 +534,26 @@ export class Paster {
 
         let inputText = "";
         let inputValue = ""
-        if(this.useCaptionAsName)
-        {
+        if (this.useCaptionAsName) {
             inputText = 'Please specify the caption of the image.'
             inputValue = ""
         }
-        else
-        {
+        else {
             inputText = 'Please specify the filename of the image.'
             inputValue = imageFileName
         }
         vscode.window
             .showInputBox({
-                prompt:inputText, //'Please specify the filename of the image.',
+                prompt: inputText, //'Please specify the filename of the image.',
                 value: inputValue,
                 valueSelection: [imageFileName.length - imageFileName.length, imageFileName.length - 4]
             })
             .then(result => {
                 if (result) {
-                    if(this.useCaptionAsName)
-                    {
-                        let imageCaptionName=""
-                        result.split(" ").forEach(function (value){
-                            imageCaptionName+=value.charAt(0).toLocaleUpperCase() + value.substr(1,value.length)
+                    if (this.useCaptionAsName) {
+                        let imageCaptionName = ""
+                        result.split(" ").forEach(function (value) {
+                            imageCaptionName += value.charAt(0).toLocaleUpperCase() + value.substr(1, value.length)
                         })
                         this.captionName = imageCaptionName
                         result = imageCaptionName
@@ -571,14 +570,13 @@ export class Paster {
                 return
             })
 
-        function makeImagePath(fileName: string, disableGraphicsPath: boolean ) {
+        function makeImagePath(fileName: string, disableGraphicsPath: boolean) {
             // image output path
             const folderPath = path.dirname(filePath)
             let imagePath = ''
-            if(!disableGraphicsPath)
-            {
-                if(vscode.window.activeTextEditor!=null)
-                return path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath) + "/" + fileName
+            if (!disableGraphicsPath) {
+                if (vscode.window.activeTextEditor != null)
+                    return path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath) + "/" + fileName
             }
 
             // generate image path
@@ -804,16 +802,16 @@ export class Paster {
         result = result.replace(this.PATH_VARIABLE_IMAGE_FILE_PATH_WITHOUT_EXT, imageFilePathWithoutExt)
         result = result.replace(this.PATH_VARIABLE_IMAGE_FILE_NAME, fileName)
         result = result.replace(this.PATH_VARIABLE_IMAGE_FILE_NAME_WITHOUT_EXT, fileNameWithoutExt)
-        
+
         result = result.replace(this.PATH_VARIABLE_IMAGE_Caption, this.captionName)
-        let imageLableName=""
-        this.captionName.split(" ").forEach(function (value){
-            imageLableName+=value.charAt(0).toLocaleUpperCase() + value.substr(1,value.length)
+        let imageLableName = ""
+        this.captionName.split(" ").forEach(function (value) {
+            imageLableName += value.charAt(0).toLocaleUpperCase() + value.substr(1, value.length)
         })
 
-        result = result.replace(this.PATH_VARIABLE_IMAGE_Lable, "fig:" + imageLableName)
-         
-         
+        result = result.replace(this.PATH_VARIABLE_IMAGE_Lable, this.labelPrefix + imageLableName)
+
+
 
         return result
     }
@@ -825,11 +823,11 @@ export class Paster {
         postFunction: (str: string) => string = x => x
     ): string {
         const currentFileDir = path.dirname(curFilePath)
-        let graphicsPath: string | string[] 
+        let graphicsPath: string | string[]
 
-            graphicsPath = this.extension.workshop.getGraphicsPath()
-            graphicsPath = graphicsPath.length !== 0 ? graphicsPath[0] : this.graphicsPathFallback
-            graphicsPath = path.resolve(currentFileDir, graphicsPath)
+        graphicsPath = this.extension.workshop.getGraphicsPath()
+        graphicsPath = graphicsPath.length !== 0 ? graphicsPath[0] : this.graphicsPathFallback
+        graphicsPath = path.resolve(currentFileDir, graphicsPath)
 
 
         pathStr = pathStr.replace(this.PATH_VARIABLE_GRAPHICS_PATH, postFunction(graphicsPath))

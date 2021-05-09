@@ -19,6 +19,7 @@ export class Paster {
     private suffixTableTemplate: string[]
     private useCaptionAsName: boolean
     private captionName: string
+    private imageAndLabelName:string
     private labelPrefix: string
 
     constructor(extension: Extension) {
@@ -28,6 +29,7 @@ export class Paster {
         this.useCaptionAsName = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsName') as boolean
         this.labelPrefix = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsNameLabelPrefix') as string
         this.captionName = ""
+        this.imageAndLabelName = ""
 
         this.extension = extension
     }
@@ -552,11 +554,12 @@ export class Paster {
                 if (result) {
                     if (this.useCaptionAsName) {
                         let imageCaptionName = ""
+                        this.captionName = result
                         result.split(" ").forEach(function (value) {
                             imageCaptionName += value.charAt(0).toLocaleUpperCase() + value.substr(1, value.length)
                         })
-                        this.captionName = imageCaptionName
-                        result = result.replaceAll(/(\W|\d)/g,"")
+                        this.imageAndLabelName = imageCaptionName.replaceAll(/(\W|\d)/g,"")
+                        result = this.imageAndLabelName
                     }
                     if (!result.endsWith(imgExtension)) {
                         result += imgExtension
@@ -804,13 +807,7 @@ export class Paster {
         result = result.replace(this.PATH_VARIABLE_IMAGE_FILE_NAME_WITHOUT_EXT, fileNameWithoutExt)
 
         result = result.replace(this.PATH_VARIABLE_IMAGE_Caption, this.captionName)
-        let imageLableName = ""
-        this.captionName.split(" ").forEach(function (value) {
-            imageLableName += value.charAt(0).toLocaleUpperCase() + value.substr(1, value.length)
-        })
-        imageLableName = imageLableName.replaceAll(/(\W|\d)/g,"")
-
-        result = result.replace(this.PATH_VARIABLE_IMAGE_Lable, this.labelPrefix + imageLableName)
+        result = result.replace(this.PATH_VARIABLE_IMAGE_Lable, this.labelPrefix + this.imageAndLabelName)
 
 
 

@@ -556,7 +556,7 @@ export class Paster {
                             imageCaptionName += value.charAt(0).toLocaleUpperCase() + value.substr(1, value.length)
                         })
                         this.captionName = imageCaptionName
-                        result = imageCaptionName
+                        result = result.replaceAll(/(\W|\d)/g,"")
                     }
                     if (!result.endsWith(imgExtension)) {
                         result += imgExtension
@@ -808,6 +808,7 @@ export class Paster {
         this.captionName.split(" ").forEach(function (value) {
             imageLableName += value.charAt(0).toLocaleUpperCase() + value.substr(1, value.length)
         })
+        imageLableName = imageLableName.replaceAll(/(\W|\d)/g,"")
 
         result = result.replace(this.PATH_VARIABLE_IMAGE_Lable, this.labelPrefix + imageLableName)
 

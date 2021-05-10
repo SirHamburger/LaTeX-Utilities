@@ -458,6 +458,7 @@ export class Paster {
             if (!vscode.window.activeTextEditor) {
                 return
             }
+            if( vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.search("includegraphics")<0)
             vscode.window.activeTextEditor.insertSnippet(new vscode.SnippetString(imagePath), editor.selection.start, {
                 undoStopBefore: true,
                 undoStopAfter: true
@@ -615,6 +616,7 @@ export class Paster {
                     if (!vscode.window.activeTextEditor) {
                         return
                     }
+                    if( vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.search("includegraphics")<0)
                     vscode.window.activeTextEditor.insertSnippet(
                         new vscode.SnippetString(imageString),
                         editor.selection.start,
@@ -649,6 +651,7 @@ export class Paster {
                         if (!vscode.window.activeTextEditor) {
                             return
                         }
+                        if(vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.search("includegraphics")<0)
                         vscode.window.activeTextEditor.insertSnippet(
                             new vscode.SnippetString(imageString),
                             editor.selection.start,
@@ -657,6 +660,7 @@ export class Paster {
                                 undoStopAfter: true
                             }
                         )
+                        
                     })
                 }
                 this.extension.telemetryReporter.sendTelemetryEvent('formattedPaste', { type: 'image' })

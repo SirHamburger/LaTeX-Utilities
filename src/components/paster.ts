@@ -512,7 +512,13 @@ export class Paster {
         }
 
         this.graphicsPathFallback = this.replacePathVariables(this.graphicsPathFallback, projectPath, filePath)
-        this.basePathConfig = this.replacePathVariables(this.basePathConfig, projectPath, filePath)
+        if(this.disableGraphicsPath)
+        {
+            if(vscode.window.activeTextEditor!=null)
+            this.basePathConfig = this.replacePathVariables(this.basePathConfig,projectPath ,  filePath)
+        }
+        else
+            this.basePathConfig = this.replacePathVariables(this.basePathConfig, projectPath, filePath)
         this.pasteTemplate = this.replacePathVariables(this.pasteTemplate, projectPath, filePath)
     }
 
@@ -581,7 +587,7 @@ export class Paster {
             let imagePath = ''
             if (disableGraphicsPath) {
                 if (vscode.window.activeTextEditor != null)
-                    return path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath) + "/" + fileName
+                    return path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath) + "\\" + fileName
             }
 
             // generate image path
@@ -828,10 +834,17 @@ export class Paster {
         const currentFileDir = path.dirname(curFilePath)
         let graphicsPath: string | string[]
 
+        if(!this.disableGraphicsPath|| vscode.window.activeTextEditor==null)
+        {
         graphicsPath = this.extension.workshop.getGraphicsPath()
         graphicsPath = graphicsPath.length !== 0 ? graphicsPath[0] : this.graphicsPathFallback
         graphicsPath = path.resolve(currentFileDir, graphicsPath)
-
+        }
+        else
+        {
+            graphicsPath = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath) +"\\"
+        }
+            
 
         pathStr = pathStr.replace(this.PATH_VARIABLE_GRAPHICS_PATH, postFunction(graphicsPath))
         pathStr = pathStr.replace(this.PATH_VARIABLE_CURRNET_FILE_DIR, postFunction(currentFileDir))

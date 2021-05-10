@@ -1,6 +1,6 @@
 # SOURCED FROM https://github.com/mushanshitiancai/vscode-paste-image/
 
-param($imagePath)
+param($imagePath, $tempPath)
 
 # Adapted from https://github.com/octan3/img-clipboard-dump/blob/master/dump-clipboard-png.ps1
 
@@ -8,7 +8,6 @@ Add-Type -Assembly PresentationCore
 #$img = [Windows.Clipboard]::GetImage()
 $img = get-clipboard -format image
 if ($img -eq $null) {
-    $tempPath = (Get-Clipboard -Format FileDropList).FullName
     if($imagePath -eq $null){
         "no image"
         Exit 1

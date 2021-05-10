@@ -21,6 +21,7 @@ export class Paster {
     private captionName: string
     private imageAndLabelName:string
     private labelPrefix: string
+    private clipboardImagePath: string 
 
     constructor(extension: Extension) {
         this.disableGraphicsPath = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.ignoreGraphicsPath') as boolean
@@ -30,6 +31,7 @@ export class Paster {
         this.labelPrefix = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsNameLabelPrefix') as string
         this.captionName = ""
         this.imageAndLabelName = ""
+        this.clipboardImagePath = ""
 
         this.extension = extension
     }
@@ -540,7 +542,9 @@ export class Paster {
             ) + 1
         const imgExtension = path.extname(imagePathCurrent) ? path.extname(imagePathCurrent) : '.png'
         const imageFileName = selectText ? selectText + imgExtension : `image${imgPostfixNumber}` + imgExtension
-
+        
+        
+        this.getClipboardImagePath();
         let inputText = "";
         let inputValue = ""
         if (this.useCaptionAsName) {
@@ -598,6 +602,35 @@ export class Paster {
             }
 
             return imagePath
+        }
+    }
+    getClipboardImagePath() {
+        const platform = process.platform
+        if (platform === 'win32') {
+            // Windows
+            const scriptPath = path.join(this.extension.extensionRoot, './scripts/getclipboardpath.ps1')
+
+            let command = 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'
+            const powershellExisted = fs.existsSync(command)
+            if (!powershellExisted) {
+                command = 'powershell'
+            }
+
+            const powershell = spawn(command, [
+                '-noprofile',
+                '-noninteractive',
+                '-nologo',
+                '-sta',
+                '-executionpolicy',
+                'unrestricted',
+                '-windowstyle',
+                'hidden',
+                '-file',
+                scriptPath
+            ])
+            powershell.stdout.on('data', (data: Buffer) => {
+                this.clipboardImagePath = data.toString().trim()
+            })
         }
     }
 
@@ -739,7 +772,8 @@ export class Paster {
                 'hidden',
                 '-file',
                 scriptPath,
-                imagePath
+                imagePath,
+                this.clipboardImagePath
             ])
             powershell.on('error', e => {
                 if (e.name === 'ENOENT') {

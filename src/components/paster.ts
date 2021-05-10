@@ -549,7 +549,8 @@ export class Paster {
             .showInputBox({
                 prompt: inputText, //'Please specify the filename of the image.',
                 value: inputValue,
-                valueSelection: [imageFileName.length - imageFileName.length, imageFileName.length - 4]
+                valueSelection: [imageFileName.length - imageFileName.length, imageFileName.length - 4],
+                ignoreFocusOut: true
             })
             .then(result => {
                 if (result) {
@@ -578,7 +579,7 @@ export class Paster {
             // image output path
             const folderPath = path.dirname(filePath)
             let imagePath = ''
-            if (!disableGraphicsPath) {
+            if (disableGraphicsPath) {
                 if (vscode.window.activeTextEditor != null)
                     return path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath) + "/" + fileName
             }

@@ -439,9 +439,14 @@ export class Paster {
         if (this.disableGraphicsPath)
             this.graphicsPathFallback = '${currentFileDir}'
         const folderPath = path.dirname(baseFile)
-        const projectPath = vscode.workspace.workspaceFolders
+        let projectPath = vscode.workspace.workspaceFolders
             ? vscode.workspace.workspaceFolders[0].uri.fsPath
             : folderPath
+        if(this.disableGraphicsPath)
+        {
+            if(vscode.window.activeTextEditor!=null)
+                projectPath = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath)
+        }
 
         // get selection as image file name, need check
         const selection = editor.selection
@@ -517,7 +522,9 @@ export class Paster {
         if(this.disableGraphicsPath)
         {
             if(vscode.window.activeTextEditor!=null)
-            this.basePathConfig = this.replacePathVariables(this.basePathConfig,projectPath ,  filePath)
+            {
+                this.basePathConfig = path.dirname(vscode.window.activeTextEditor.document.uri.fsPath)
+            }
         }
         else
             this.basePathConfig = this.replacePathVariables(this.basePathConfig, projectPath, filePath)

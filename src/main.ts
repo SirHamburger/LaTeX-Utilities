@@ -45,6 +45,9 @@ export function activate(context: vscode.ExtensionContext) {
         ),
         vscode.commands.registerCommand('latex-utilities.bold', () =>
             extension.quickInsert.bold()
+        ),
+        vscode.commands.registerCommand('latex-utilities.cleanFormating', () =>
+            extension.quickInsert.cleanFormating()
         )
     )
 

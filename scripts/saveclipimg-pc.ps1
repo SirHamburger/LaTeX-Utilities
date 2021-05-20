@@ -5,10 +5,10 @@ param($imagePath, $tempPath)
 # Adapted from https://github.com/octan3/img-clipboard-dump/blob/master/dump-clipboard-png.ps1
 
 Add-Type -Assembly PresentationCore
-#$img = [Windows.Clipboard]::GetImage()
-$img = get-clipboard -format image
+$img = [Windows.Clipboard]::GetImage()
+#$img = get-clipboard -format image
 if ($img -eq $null) {
-    if($imagePath -eq $null){
+    if($imagePath -eq ""){
         "no image"
         Exit 1
     }

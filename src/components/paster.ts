@@ -22,6 +22,8 @@ export class Paster {
     private imageAndLabelName:string
     private labelPrefix: string
     private clipboardImagePath: string 
+    private foundImage: boolean
+    private currentName: string | null
 
     constructor(extension: Extension) {
         this.disableGraphicsPath = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.ignoreGraphicsPath') as boolean
@@ -29,9 +31,11 @@ export class Paster {
         this.suffixTableTemplate = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.SuffixTableTemplate') as string[]
         this.useCaptionAsName = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsName') as boolean
         this.labelPrefix = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsNameLabelPrefix') as string
+        this.foundImage= false
         this.captionName = ""
         this.imageAndLabelName = ""
         this.clipboardImagePath = ""
+        this.currentName = ""
 
         this.extension = extension
     }
@@ -435,6 +439,7 @@ export class Paster {
     graphicsPathFallback = '${currentFileDir}'
 
     public pasteImage(editor: vscode.TextEditor, baseFile: string, imgFile?: string) {
+        this.clipboardImagePath=""
         this.extension.logger.addLogMessage('Pasting: Image')
         if (this.disableGraphicsPath)
             this.graphicsPathFallback = '${currentFileDir}'
@@ -446,6 +451,18 @@ export class Paster {
         {
             if(vscode.window.activeTextEditor!=null)
                 projectPath = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath)
+        }
+        if (!vscode.window.activeTextEditor) {
+            return
+        }
+        if( vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.search("includegraphics")>0)
+        {
+            this.foundImage = true;
+                const lineText = vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text
+                const match =/(?<=\\includegraphics\[*?.*?\]*?\{).*?(?=\})/.exec(lineText)
+                if(match!=null)
+                this.currentName =match[0]
+            
         }
 
         // get selection as image file name, need check
@@ -465,7 +482,7 @@ export class Paster {
             if (!vscode.window.activeTextEditor) {
                 return
             }
-            if( vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.search("includegraphics")<0)
+            if( !this.foundImage)
             vscode.window.activeTextEditor.insertSnippet(new vscode.SnippetString(imagePath), editor.selection.start, {
                 undoStopBefore: true,
                 undoStopAfter: true
@@ -548,13 +565,14 @@ export class Paster {
                     .filter(num => !isNaN(num))
             ) + 1
         const imgExtension = path.extname(imagePathCurrent) ? path.extname(imagePathCurrent) : '.png'
-        const imageFileName = selectText ? selectText + imgExtension : `image${imgPostfixNumber}` + imgExtension
-        
+        var imageFileName = selectText ? selectText + imgExtension : `image${imgPostfixNumber}` + imgExtension
+        if(this.currentName != null)
+                imageFileName = this.currentName
         
         this.getClipboardImagePath();
         let inputText = "";
         let inputValue = ""
-        if (this.useCaptionAsName) {
+        if (this.useCaptionAsName&& !this.foundImage) {
             inputText = 'Please specify the caption of the image.'
             inputValue = ""
         }
@@ -571,7 +589,7 @@ export class Paster {
             })
             .then(result => {
                 if (result) {
-                    if (this.useCaptionAsName) {
+                    if (this.useCaptionAsName&&!this.foundImage) {
                         let imageCaptionName = ""
                         this.captionName = result
                         result.split(" ").forEach(function (value) {
@@ -663,7 +681,7 @@ export class Paster {
                     if (!vscode.window.activeTextEditor) {
                         return
                     }
-                    if( vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.search("includegraphics")<0)
+                    if( !this.foundImage)
                     vscode.window.activeTextEditor.insertSnippet(
                         new vscode.SnippetString(imageString),
                         editor.selection.start,
@@ -698,7 +716,7 @@ export class Paster {
                         if (!vscode.window.activeTextEditor) {
                             return
                         }
-                        if(vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.search("includegraphics")<0)
+                        if(!this.foundImage)
                         vscode.window.activeTextEditor.insertSnippet(
                             new vscode.SnippetString(imageString),
                             editor.selection.start,

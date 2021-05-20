@@ -1,4 +1,4 @@
-### <img src="https://i.ibb.co/X3PVszN/warning-5-64.png" alt="warning-5-64" border="0" height="16em"> Warning — looking for a maintainer
+<!-- ### <img src="https://i.ibb.co/X3PVszN/warning-5-64.png" alt="warning-5-64" border="0" height="16em"> Warning — looking for a maintainer
 
 **This extension is no longer maintained.** I'm sorry, it's not you, it's me. I still love this functionality, I've just moved to a different editor to get it.
 I don't want to leave you in the lurch, but I find it somewhat difficult to spend much time on an extension for an editor I no longer use.
@@ -103,4 +103,4 @@ At the moment I'm just logging when one of the main features is used.
 
 ### I hate telemetry, go away!
 
-You probably have disabled vscode's `telemetry.enableTelemetry` then, in which case no telemetry is done.
+You probably have disabled vscode's `telemetry.enableTelemetry` then, in which case no telemetry is done. -->

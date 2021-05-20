@@ -75,6 +75,11 @@
                 "command": "latex-utilities.selectWordcountFormat",
                 "title": "Select wordcount format",
                 "category": "LaTeX Utilities"
+            },
+            {
+                "command": "latex-utilities.bold",
+                "title": "Surround selections with textbf",
+                "category": "LaTeX Utilities"
             }
         ],
         "keybindings": [
@@ -95,6 +100,11 @@
                 "mac": "cmd+v",
                 "command": "latex-utilities.formattedPaste",
                 "when": "config.latex-utilities.formattedPaste.useAsDefault && editorTextFocus && editorLangId == 'latex'"
+            },
+            {
+                "key": "ctrl+b",
+                "command": "latex-utilities.bold",
+                "when": "editorTextFocus && editorLangId == 'latex'"
             }
         ],
         "configuration": {

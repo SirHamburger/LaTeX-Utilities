@@ -10,6 +10,8 @@ import { TikzCodeLense } from './providers/tikzcodelense'
 import { MacroDefinitions } from './providers/macroDefinitions'
 import { TikzPictureView } from './components/tikzpreview'
 import { Zotero } from './components/zotero'
+import { quickInsert } from './components/quickInsert'
+
 import * as utils from './utils'
 
 import TelemetryReporter from 'vscode-extension-telemetry'
@@ -40,6 +42,9 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('latex-utilities.openInZotero', () => extension.zotero.openCitation()),
         vscode.commands.registerCommand('latex-utilities.selectWordcountFormat', () =>
             extension.wordCounter.pickFormat()
+        ),
+        vscode.commands.registerCommand('latex-utilities.bold', () =>
+            extension.quickInsert.bold()
         )
     )
 
@@ -187,7 +192,7 @@ export class Extension {
     wordCounter: WordCounter
     tikzPreview: TikzPictureView
     zotero: Zotero
-
+    quickInsert: quickInsert
     constructor() {
         this.extensionRoot = path.resolve(`${__dirname}/../../`)
         const self = vscode.extensions.getExtension('tecosaur.latex-utilities') as vscode.Extension<any>
@@ -208,6 +213,7 @@ export class Extension {
         this.wordCounter = new WordCounter(this)
         this.tikzPreview = new TikzPictureView(this)
         this.zotero = new Zotero(this)
+        this.quickInsert= new quickInsert(this)
     }
 }
 

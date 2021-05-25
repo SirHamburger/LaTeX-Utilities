@@ -42,7 +42,12 @@ export class Paster {
 
     public async paste() {
         this.extension.logger.addLogMessage('Performing formatted paste')
-
+        this.foundImage= false
+        this.captionName = ""
+        this.imageAndLabelName = ""
+        this.clipboardImagePath = ""
+        this.currentName = ""
+        
         // get current edit file path
         const editor = vscode.window.activeTextEditor
         if (!editor) {

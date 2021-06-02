@@ -80,6 +80,11 @@
                 "command": "latex-utilities.cleanFormating",
                 "title": "Remove all commands in the selection",
                 "category": "LaTeX Utilities"
+            },
+            {
+                "command": "latex-utilities.replaceInput",
+                "title": "replace input",
+                "category": "LaTeX Utilities"
             }
         ],
         "keybindings": [

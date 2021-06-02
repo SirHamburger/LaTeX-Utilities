@@ -1,4 +1,10 @@
 import * as vscode from 'vscode'
+import * as path from 'path'
+import * as fs from 'fs'
+import * as fse from 'fs-extra'
+import { spawn } from 'child_process'
+import * as csv from 'csv-parser'
+import { Readable } from 'stream'
 
 import { Extension } from '../main'
 
@@ -22,5 +28,50 @@ export class quickInsert {
             }
         })
 
+    }
+    public replaceImport() {
+        let rootFile = this.extension.workshop.manager.rootFile()
+        let fileName = rootFile.split('\\')[rootFile.split('\\').length - 1]
+        if (vscode.window.activeTextEditor == null)
+            return;
+        let rootFilePath = rootFile.substr(0, rootFile.lastIndexOf('\\'))
+        let activeFilepath = vscode.window.activeTextEditor?.document.uri.fsPath.substr(0, vscode.window.activeTextEditor?.document.uri.fsPath.lastIndexOf('\\'))
+        let activeFilename = vscode.window.activeTextEditor.document.fileName.split('\\')[vscode.window.activeTextEditor.document.fileName.split('\\').length - 1]
+        let relativePath = path.relative(rootFilePath, activeFilepath)
+        relativePath = relativePath.replaceAll(/(\\)/g, "/")
+        rootFile = rootFile.replaceAll(/(\\)/g, "/")
+        //activeFilepath = activeFilepath.replaceAll(/(\\)/g,"/")
+        if (fileName != "buildOnly.tex")
+            return;
+        let currentTextDocument = vscode.window.activeTextEditor.document.fileName
+        var setting: vscode.Uri = vscode.Uri.parse("file:///" + rootFile);
+        let replaceLine = -1;
+        let replaceLineEnd = -1
+        let latexPath = activeFilepath.replaceAll(/(\\)/g, "/")
+        vscode.workspace.openTextDocument(setting).then((a: vscode.TextDocument) => {
+            vscode.window.showTextDocument(a, 1, false).then(e => {
+                for (let i = 0; i < e.document.lineCount; i++) {
+                    if (e.document.lineAt(i).text.trim() == "%=>") {
+                        replaceLine = i + 1
+                    }
+                    if (e.document.lineAt(i).text.trim() == "%<=") {
+                        replaceLineEnd = i - 1
+                    }
+                }
+                if (replaceLine == -1 || replaceLineEnd == -1)
+                    return;
+
+                e.edit(edit => {
+                    edit.replace(new vscode.Range(new vscode.Position(replaceLine, 0), new vscode.Position(replaceLineEnd, e.document.lineAt(replaceLineEnd).text.length)), "\\subimport{" + relativePath + "/}{" + activeFilename + "}")
+                });
+                e.document.save()
+                vscode.workspace.openTextDocument(currentTextDocument).then((a: vscode.TextDocument) => {
+                    vscode.window.showTextDocument(a, 1, false).then(e => { });
+                });
+            });
+        }, (error: any) => {
+            console.error(error);
+            debugger;
+        });
     }
 }

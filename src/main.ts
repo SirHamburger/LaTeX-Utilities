@@ -43,8 +43,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('latex-utilities.selectWordcountFormat', () =>
             extension.wordCounter.pickFormat()
         ),
-        vscode.commands.registerCommand('latex-utilities.bold', () =>
-            extension.quickInsert.bold()
+        vscode.commands.registerCommand('latex-utilities.replaceInput', () =>
+            extension.quickInsert.replaceImport()
         ),
         vscode.commands.registerCommand('latex-utilities.cleanFormating', () =>
             extension.quickInsert.cleanFormating()

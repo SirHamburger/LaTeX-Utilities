@@ -30,12 +30,22 @@ export class quickInsert {
 
     }
     public replaceImport() {
-        let rootFile = this.extension.workshop.manager.rootFile()
-        let fileName = rootFile.split('\\')[rootFile.split('\\').length - 1]
+        //let rootFile = this.extension.workshop.manager.rootFile()
+        
         if (vscode.window.activeTextEditor == null)
             return;
-        let rootFilePath = rootFile.substr(0, rootFile.lastIndexOf('\\'))
+        let activeDocumentText = vscode.window.activeTextEditor.document.getText()
+        let texRootPos= activeDocumentText.indexOf("% !TeX root =")
+        let rootMatch = activeDocumentText.match(/% !TeX root =.*/)
+        if (rootMatch == null )
+            return
         let activeFilepath = vscode.window.activeTextEditor?.document.uri.fsPath.substr(0, vscode.window.activeTextEditor?.document.uri.fsPath.lastIndexOf('\\'))
+        let rootFile = rootMatch[0].replace("% !TeX root = ","")
+        rootFile= path.resolve(activeFilepath,rootFile)
+
+        let fileName = rootFile.split('\\')[rootFile.split('\\').length - 1]
+
+        let rootFilePath = rootFile.substr(0, rootFile.lastIndexOf('\\'))
         let activeFilename = vscode.window.activeTextEditor.document.fileName.split('\\')[vscode.window.activeTextEditor.document.fileName.split('\\').length - 1]
         let relativePath = path.relative(rootFilePath, activeFilepath)
         relativePath = relativePath.replaceAll(/(\\)/g, "/")

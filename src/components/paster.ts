@@ -36,7 +36,7 @@ export class Paster {
         this.imageAndLabelName = ""
         this.clipboardImagePath = ""
         this.currentName = ""
-
+        this.foundImage = false
         this.extension = extension
     }
 

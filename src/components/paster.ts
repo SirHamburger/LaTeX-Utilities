@@ -600,7 +600,7 @@ export class Paster {
                         result.split(" ").forEach(function (value) {
                             imageCaptionName += value.charAt(0).toLocaleUpperCase() + value.substr(1, value.length)
                         })
-                        this.imageAndLabelName = imageCaptionName.replaceAll(/(\W|\d)/g,"")
+                        this.imageAndLabelName = imageCaptionName.replaceAll(/(\W)/g,"")
                         result = this.imageAndLabelName
                     }
                     if (!result.endsWith(imgExtension)) {

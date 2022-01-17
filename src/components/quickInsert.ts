@@ -43,7 +43,7 @@ export class quickInsert {
         let rootFile = rootMatch[0].replace("% !TeX root = ","")
         rootFile= path.resolve(activeFilepath,rootFile)
 
-        let fileName = rootFile.split('\\')[rootFile.split('\\').length - 1]
+        let fileName = rootFile.split('\\')[rootFile.split('\\').length - 1].trim()
 
         let rootFilePath = rootFile.substr(0, rootFile.lastIndexOf('\\'))
         let activeFilename = vscode.window.activeTextEditor.document.fileName.split('\\')[vscode.window.activeTextEditor.document.fileName.split('\\').length - 1]
@@ -54,7 +54,7 @@ export class quickInsert {
         if (fileName != "buildOnly.tex")
             return;
         let currentTextDocument = vscode.window.activeTextEditor.document.fileName
-        var setting: vscode.Uri = vscode.Uri.parse("file:///" + rootFile);
+        var setting: vscode.Uri = vscode.Uri.parse("file:///" + rootFile.trim());
         let replaceLine = -1;
         let replaceLineEnd = -1
         let latexPath = activeFilepath.replaceAll(/(\\)/g, "/")

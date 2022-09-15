@@ -3,7 +3,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as fse from 'fs-extra'
 import { spawn } from 'child_process'
-import * as csv from 'csv-parser'
+import csv from 'csv-parser'
 import { Readable } from 'stream'
 
 import { Extension } from '../main'
@@ -19,9 +19,9 @@ export class Paster {
     private suffixTableTemplate: string[]
     private useCaptionAsName: boolean
     private captionName: string
-    private imageAndLabelName:string
+    private imageAndLabelName: string
     private labelPrefix: string
-    private clipboardImagePath: string 
+    private clipboardImagePath: string
     private foundImage: boolean
     private currentName: string | null
 
@@ -31,7 +31,7 @@ export class Paster {
         this.suffixTableTemplate = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.SuffixTableTemplate') as string[]
         this.useCaptionAsName = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsName') as boolean
         this.labelPrefix = vscode.workspace.getConfiguration('latex-utilities').get('formattedPaste.image.useCaptionAsNameLabelPrefix') as string
-        this.foundImage= false
+        this.foundImage = false
         this.captionName = ""
         this.imageAndLabelName = ""
         this.clipboardImagePath = ""
@@ -42,12 +42,12 @@ export class Paster {
 
     public async paste() {
         this.extension.logger.addLogMessage('Performing formatted paste')
-        this.foundImage= false
+        this.foundImage = false
         this.captionName = ""
         this.imageAndLabelName = ""
         this.clipboardImagePath = ""
         this.currentName = ""
-        
+
         // get current edit file path
         const editor = vscode.window.activeTextEditor
         if (!editor) {
@@ -444,7 +444,7 @@ export class Paster {
     graphicsPathFallback = '${currentFileDir}'
 
     public pasteImage(editor: vscode.TextEditor, baseFile: string, imgFile?: string) {
-        this.clipboardImagePath=""
+        this.clipboardImagePath = ""
         this.extension.logger.addLogMessage('Pasting: Image')
         if (this.disableGraphicsPath)
             this.graphicsPathFallback = '${currentFileDir}'
@@ -452,22 +452,20 @@ export class Paster {
         let projectPath = vscode.workspace.workspaceFolders
             ? vscode.workspace.workspaceFolders[0].uri.fsPath
             : folderPath
-        if(this.disableGraphicsPath)
-        {
-            if(vscode.window.activeTextEditor!=null)
+        if (this.disableGraphicsPath) {
+            if (vscode.window.activeTextEditor != null)
                 projectPath = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath)
         }
         if (!vscode.window.activeTextEditor) {
             return
         }
-        if( vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.search("includegraphics")>0)
-        {
+        if (vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text.search("includegraphics") > 0) {
             this.foundImage = true;
-                const lineText = vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text
-                const match =/(?<=\\includegraphics\[*?.*?\]*?\{).*?(?=\})/.exec(lineText)
-                if(match!=null)
-                this.currentName =match[0]
-            
+            const lineText = vscode.window.activeTextEditor.document.lineAt(vscode.window.activeTextEditor.selection.active.line).text
+            const match = /(?<=\\includegraphics\[*?.*?\]*?\{).*?(?=\})/.exec(lineText)
+            if (match != null)
+                this.currentName = match[0]
+
         }
 
         // get selection as image file name, need check
@@ -487,11 +485,11 @@ export class Paster {
             if (!vscode.window.activeTextEditor) {
                 return
             }
-            if( !this.foundImage)
-            vscode.window.activeTextEditor.insertSnippet(new vscode.SnippetString(imagePath), editor.selection.start, {
-                undoStopBefore: true,
-                undoStopAfter: true
-            })
+            if (!this.foundImage)
+                vscode.window.activeTextEditor.insertSnippet(new vscode.SnippetString(imagePath), editor.selection.start, {
+                    undoStopBefore: true,
+                    undoStopAfter: true
+                })
 
             return
         }
@@ -540,11 +538,10 @@ export class Paster {
             this.pasteTemplate = pasteTemplate.join('\n')
         }
 
-        this.graphicsPathFallback = this.replacePathVariables(this.graphicsPathFallback, projectPath, filePath)
-        if(this.disableGraphicsPath)
-        {
-            if(vscode.window.activeTextEditor!=null)
-            {
+        this.graphicsPathFallback = this.replacePathVariables('${currentFileDir}', projectPath, filePath)
+        this.basePathConfig = this.replacePathVariables('${graphicsPath}', projectPath, filePath)
+        if (this.disableGraphicsPath) {
+            if (vscode.window.activeTextEditor != null) {
                 this.basePathConfig = path.dirname(vscode.window.activeTextEditor.document.uri.fsPath)
             }
         }
@@ -571,13 +568,13 @@ export class Paster {
             ) + 1
         const imgExtension = path.extname(imagePathCurrent) ? path.extname(imagePathCurrent) : '.png'
         var imageFileName = selectText ? selectText + imgExtension : `image${imgPostfixNumber}` + imgExtension
-        if(this.currentName != null)
-                imageFileName = this.currentName
-        
+        if (this.currentName != null)
+            imageFileName = this.currentName
+
         this.getClipboardImagePath();
         let inputText = "";
         let inputValue = ""
-        if (this.useCaptionAsName&& !this.foundImage) {
+        if (this.useCaptionAsName && !this.foundImage) {
             inputText = 'Please specify the caption of the image.'
             inputValue = ""
         }
@@ -594,13 +591,13 @@ export class Paster {
             })
             .then(result => {
                 if (result) {
-                    if (this.useCaptionAsName&&!this.foundImage) {
+                    if (this.useCaptionAsName && !this.foundImage) {
                         let imageCaptionName = ""
                         this.captionName = result
                         result.split(" ").forEach(function (value) {
                             imageCaptionName += value.charAt(0).toLocaleUpperCase() + value.substr(1, value.length)
                         })
-                        this.imageAndLabelName = imageCaptionName.replaceAll(/(\W)/g,"")
+                        this.imageAndLabelName = imageCaptionName.replaceAll(/(\W)/g, "")
                         result = this.imageAndLabelName
                     }
                     if (!result.endsWith(imgExtension)) {
@@ -686,15 +683,15 @@ export class Paster {
                     if (!vscode.window.activeTextEditor) {
                         return
                     }
-                    if( !this.foundImage)
-                    vscode.window.activeTextEditor.insertSnippet(
-                        new vscode.SnippetString(imageString),
-                        editor.selection.start,
-                        {
-                            undoStopBefore: true,
-                            undoStopAfter: true
-                        }
-                    )
+                    if (!this.foundImage)
+                        vscode.window.activeTextEditor.insertSnippet(
+                            new vscode.SnippetString(imageString),
+                            editor.selection.start,
+                            {
+                                undoStopBefore: true,
+                                undoStopAfter: true
+                            }
+                        )
                 } else {
                     this.saveClipboardImageToFileAndGetPath(imagePath, (_imagePath, imagePathReturnByScript) => {
                         if (!imagePathReturnByScript) {
@@ -721,16 +718,16 @@ export class Paster {
                         if (!vscode.window.activeTextEditor) {
                             return
                         }
-                        if(!this.foundImage)
-                        vscode.window.activeTextEditor.insertSnippet(
-                            new vscode.SnippetString(imageString),
-                            editor.selection.start,
-                            {
-                                undoStopBefore: true,
-                                undoStopAfter: true
-                            }
-                        )
-                        
+                        if (!this.foundImage)
+                            vscode.window.activeTextEditor.insertSnippet(
+                                new vscode.SnippetString(imageString),
+                                editor.selection.start,
+                                {
+                                    undoStopBefore: true,
+                                    undoStopAfter: true
+                                }
+                            )
+
                     })
                 }
                 this.extension.telemetryReporter.sendTelemetryEvent('formattedPaste', { type: 'image' })
@@ -781,7 +778,64 @@ export class Paster {
         }
 
         const platform = process.platform
-        if (platform === 'win32') {
+        if (vscode.env.remoteName === 'wsl') {
+            //  WSL
+            let scriptPath = path.join(this.extension.extensionRoot, './scripts/saveclipimg-pc.ps1')
+            // convert scriptPath to windows path
+            const wslpath = spawn('wslpath', [
+                '-w',
+                scriptPath
+            ])
+            wslpath.stdout.on('data', (data) => {
+                scriptPath = data.toString().trim()
+                // SEE Powershell/powershell#17623
+                scriptPath = scriptPath.replace('\\wsl.localhost', '\\wsl$')
+
+                this.extension.logger.addLogMessage(`saveClipimg-pc.ps1: ${scriptPath}`)
+                const wslPath = spawn('wslpath', [
+                    '-w',
+                    imagePath
+                ])
+                wslPath.stdout.on('data', (data2) => {
+                    // Yes. callback hell.
+                    // TODO: refactor this.
+                    imagePath = data2.toString().trim()
+                    this.extension.logger.addLogMessage(`imagePath: ${imagePath}`)
+
+                    const command = 'powershell.exe'  // Adding `exe` to run it from wsl
+
+                    const powershell = spawn(command, [
+                        '-noprofile',
+                        '-noninteractive',
+                        '-nologo',
+                        '-sta',
+                        '-executionpolicy',
+                        'unrestricted',
+                        '-windowstyle',
+                        'hidden',
+                        '-file',
+                        scriptPath,
+                        imagePath
+                    ])
+                    powershell.on('error', e => {
+                        if (e.name === 'ENOENT') {
+                            vscode.window.showErrorMessage(
+                                'The powershell command is not in you PATH environment variables.Please add it and retry.'
+                            )
+                        } else {
+                            console.log(e)
+                            vscode.window.showErrorMessage(e.message)
+                        }
+                    })
+                    powershell.on('exit', (_code, _signal) => {
+                        // console.log('exit', code, signal);
+                    })
+                    powershell.stdout.on('data', (data3: Buffer) => {
+                        cb(imagePath, data3.toString().trim())
+                    })
+                })
+            })
+        } else if (platform === 'win32') {
             // Windows
             const scriptPath = path.join(this.extension.extensionRoot, './scripts/saveclipimg-pc.ps1')
 
@@ -897,18 +951,21 @@ export class Paster {
     ): string {
         const currentFileDir = path.dirname(curFilePath)
         let graphicsPath: string | string[]
+        graphicsPath =""
 
-        if(!this.disableGraphicsPath|| vscode.window.activeTextEditor==null)
-        {
-        graphicsPath = this.extension.workshop.getGraphicsPath()
-        graphicsPath = graphicsPath.length !== 0 ? graphicsPath[0] : this.graphicsPathFallback
-        graphicsPath = path.resolve(currentFileDir, graphicsPath)
+        if (!this.disableGraphicsPath || vscode.window.activeTextEditor == null) {
+            const text = vscode.window.activeTextEditor?.document.getText()
+            if (!text) {
+                return pathStr
+            }
+            let graphicsPath: string | string[] = this.extension.manager.getGraphicsPath(text)
+            graphicsPath = graphicsPath.length !== 0 ? graphicsPath[0] : this.graphicsPathFallback
+            graphicsPath = path.resolve(currentFileDir, graphicsPath)
         }
-        else
-        {
-            graphicsPath = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath) +"\\"
+        else {
+            graphicsPath = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath) + "\\"
         }
-            
+
 
         pathStr = pathStr.replace(this.PATH_VARIABLE_GRAPHICS_PATH, postFunction(graphicsPath))
         pathStr = pathStr.replace(this.PATH_VARIABLE_CURRNET_FILE_DIR, postFunction(currentFileDir))

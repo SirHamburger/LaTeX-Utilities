@@ -2,7 +2,8 @@
     "compilerOptions": {
         "alwaysStrict": true,
         "forceConsistentCasingInFileNames": true,
-        "lib": ["es2018"],
+        "lib": ["es2018",
+        "ES2021.String"],
         "module": "commonjs",
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,

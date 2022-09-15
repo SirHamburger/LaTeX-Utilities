@@ -254,7 +254,7 @@
         "@types/vscode": "^1.45.0",
         "@typescript-eslint/eslint-plugin": "^1.13.0",
         "@typescript-eslint/parser": "^1.13.0",
-        "esbuild": "^0.14.49",
+        "esbuild": "^0.14.54",
         "eslint": "^6.8.0",
         "glob": "^7.1.6",
         "mocha": "^6.2.2",
@@ -268,6 +268,7 @@
         "fs-extra": "^8.1.0",
         "latex-utensils": "^4.1.0",
         "tmp": "^0.2.1",
-        "vscode-extension-telemetry": "^0.1.2"
+        "vscode-extension-telemetry": "^0.1.2",
+        "yarn": "^1.22.19"
     }
 }

@@ -53,9 +53,6 @@ export function activate(context: vscode.ExtensionContext) {
                 extension.zotero.openCitation()
             })
         ),
-        vscode.commands.registerCommand('latex-utilities.selectWordcountFormat', () =>
-            extension.wordCounter.pickFormat()
-        ),
         vscode.commands.registerCommand('latex-utilities.replaceInput', () =>
             extension.quickInsert.replaceImport()
         ),

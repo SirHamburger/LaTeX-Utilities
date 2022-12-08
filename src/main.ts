@@ -203,9 +203,9 @@ export class Extension {
         } catch (error) {
             this.logger.addLogMessage(error)
             this.telemetryReporter.sendTelemetryException(error, {
-                'command': command
+                command
             })
-            this.logger.addLogMessage("Error reported.")
+            this.logger.addLogMessage('Error reported.')
         }
     }
 }
